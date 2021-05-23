@@ -8,9 +8,54 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Date;
+use DB;
 
 class EventsController extends BaseController
 {
+    /*
+     Requirements:
+    - maximum 1 sql query
+    - verify your solution with `php artisan test`
+    - do a `git commit && git push` after you are done or when the time limit is over
+
+    Hints:
+    - open the `app/Http/Controllers/EventsController` file
+    - partial or not working answers also get graded so make sure you commit what you have
+
+    Sample response on GET /warmupevents:
+    ```json
+    [
+        {
+            "id": 1,
+            "name": "Laravel convention 2020",
+            "created_at": "2021-04-25T09:32:27.000000Z",
+            "updated_at": "2021-04-25T09:32:27.000000Z"
+        },
+        {
+            "id": 2,
+            "name": "Laravel convention 2021",
+            "created_at": "2021-04-25T09:32:27.000000Z",
+            "updated_at": "2021-04-25T09:32:27.000000Z"
+        },
+        {
+            "id": 3,
+            "name": "React convention 2021",
+            "created_at": "2021-04-25T09:32:27.000000Z",
+            "updated_at": "2021-04-25T09:32:27.000000Z"
+        }
+    ]
+     */
+
+    public function getWarmUpEvents() {
+
+        $result = [];
+        foreach (DB::table('events')->get() as $event) {
+            $result[] = $event;
+        }
+
+        return json_encode($result);
+    }
+
     /*
      Requirements:
     - maximum 2 sql queries
@@ -97,7 +142,21 @@ class EventsController extends BaseController
      */
 
     public function getEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 1');
+
+        $result = [];
+        foreach (DB::table('events')->get() as $event) {
+            $workShopList = DB::table('workshops')->where('event_id', $event->id)->get();
+
+            $data = $event;
+            foreach ($workShopList as $workShopDetails) {
+                $data->workshops[] = $workShopDetails;
+            }
+
+            $result[] = $data;
+        }
+
+        return json_encode($result);
+
     }
 
 
