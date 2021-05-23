@@ -49,7 +49,7 @@ class EventsController extends BaseController
     public function getWarmUpEvents() {
 
         $result = [];
-        foreach (DB::table('events')->get() as $event) {
+        foreach ($this->getAllEvents() as $event) {
             $result[] = $event;
         }
 
@@ -144,7 +144,7 @@ class EventsController extends BaseController
     public function getEventsWithWorkshops() {
 
         $result = [];
-        foreach (DB::table('events')->get() as $event) {
+        foreach ($this->getAllEvents() as $event) {
             $workShopList = DB::table('workshops')->where('event_id', $event->id)->get();
 
             $data = $event;
@@ -235,6 +235,33 @@ class EventsController extends BaseController
      */
 
     public function getFutureEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 2');
+
+        $result = [];
+        foreach ($this->getAllEvents() as $event) {
+            $workShopList = DB::table('workshops')
+                ->where('event_id', $event->id)
+                ->where('start', '>', date('Y-m-d H:i:s'))
+                //->orderBy('start')
+                ->get();
+
+            if (empty($workShopList->toArray())) {
+                continue;
+            }
+
+            $data = $event;
+            foreach ($workShopList as $workShopDetails) {
+                $data->workshops[] = $workShopDetails;
+            }
+
+            $result[] = $data;
+        }
+
+        return json_encode($result);
+    }
+
+
+    public function getAllEvents()
+    {
+        return DB::table('events')->get();
     }
 }
