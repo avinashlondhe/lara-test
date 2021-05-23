@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
 use Illuminate\Routing\Controller as BaseController;
+use DB;
 
 class MenuController extends BaseController
 {
@@ -94,7 +95,49 @@ class MenuController extends BaseController
     ]
      */
 
-    public function getMenuItems() {
-        throw new \Exception('implement in coding task 3');
+    public function getMenuItems()
+    {
+        $result = [];
+
+        //Fetch top parent menu only
+        foreach (DB::table('menu_items')->whereNull('parent_id')->get() as $menuItem) {
+
+            $childResult = $this->getChildMenus($menuItem->id);
+            if (false !== $childResult) {
+                $menuItem->children = $childResult;
+            }
+
+            $result[] = $menuItem;
+        }
+
+        return json_encode($result);
+    }
+
+    /**
+     * Recursive function to find child menus
+     *
+     * @param integer $parentId
+     * @return array $result;
+     */
+    public function getChildMenus(int $parentId)
+    {
+        $childMenus = DB::table('menu_items')->where('parent_id', $parentId)->get();
+
+        if (empty($childMenus->toArray())) {
+            return false;
+        }
+
+        $result = [];
+        foreach ($childMenus as $data) {
+            $childResult = $this->getChildMenus($data->id);
+
+            if (false !== $childResult) {
+                $data->children = $childResult;
+            }
+
+            $result[] = $data;
+        }
+
+        return $result;
     }
 }

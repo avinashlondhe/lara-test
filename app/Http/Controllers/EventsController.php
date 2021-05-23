@@ -46,8 +46,8 @@ class EventsController extends BaseController
     ]
      */
 
-    public function getWarmUpEvents() {
-
+    public function getWarmUpEvents()
+    {
         $result = [];
         foreach ($this->getAllEvents() as $event) {
             $result[] = $event;
@@ -141,8 +141,8 @@ class EventsController extends BaseController
     ]
      */
 
-    public function getEventsWithWorkshops() {
-
+    public function getEventsWithWorkshops()
+    {
         $result = [];
         foreach ($this->getAllEvents() as $event) {
             $workShopList = DB::table('workshops')->where('event_id', $event->id)->get();
@@ -156,7 +156,6 @@ class EventsController extends BaseController
         }
 
         return json_encode($result);
-
     }
 
 
@@ -234,9 +233,10 @@ class EventsController extends BaseController
     ```
      */
 
-    public function getFutureEventsWithWorkshops() {
-
+    public function getFutureEventsWithWorkshops()
+    {
         $result = [];
+
         foreach ($this->getAllEvents() as $event) {
             $workShopList = DB::table('workshops')
                 ->where('event_id', $event->id)
@@ -259,7 +259,11 @@ class EventsController extends BaseController
         return json_encode($result);
     }
 
-
+    /**
+     * Get all events
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public function getAllEvents()
     {
         return DB::table('events')->get();
